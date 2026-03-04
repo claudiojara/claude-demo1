@@ -1,20 +1,25 @@
 "use client";
 
-import type { ToolInvocation } from "ai";
 import { Loader2 } from "lucide-react";
 
 interface ToolCallIndicatorProps {
-  toolInvocation: ToolInvocation;
+  toolInvocation: {
+    toolName: string;
+    toolCallId: string;
+    input?: Record<string, unknown>;
+    output?: unknown;
+    state: string;
+  };
 }
 
 export function getToolLabel(
   toolName: string,
-  args: Record<string, unknown>
+  input: Record<string, unknown>
 ): string {
-  const path = typeof args.path === "string" ? args.path : "";
+  const path = typeof input.path === "string" ? input.path : "";
 
   if (toolName === "str_replace_editor") {
-    switch (args.command) {
+    switch (input.command) {
       case "create":
         return `Creating ${path}`;
       case "str_replace":
@@ -28,9 +33,9 @@ export function getToolLabel(
   }
 
   if (toolName === "file_manager") {
-    switch (args.command) {
+    switch (input.command) {
       case "rename": {
-        const newPath = typeof args.new_path === "string" ? args.new_path : "";
+        const newPath = typeof input.new_path === "string" ? input.new_path : "";
         return `Renaming ${path} → ${newPath}`;
       }
       case "delete":
@@ -46,9 +51,9 @@ export function getToolLabel(
 export function ToolCallIndicator({ toolInvocation }: ToolCallIndicatorProps) {
   const label = getToolLabel(
     toolInvocation.toolName,
-    toolInvocation.args as Record<string, unknown>
+    (toolInvocation.input || {}) as Record<string, unknown>
   );
-  const isDone = toolInvocation.state === "result" && toolInvocation.result;
+  const isDone = toolInvocation.state === "output-available" && toolInvocation.output;
 
   return (
     <div className="inline-flex items-center gap-2 mt-2 px-3 py-1.5 bg-neutral-50 rounded-lg text-xs font-mono border border-neutral-200">

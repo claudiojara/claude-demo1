@@ -73,33 +73,33 @@ function makeInvocation(overrides: Record<string, unknown> = {}) {
   return {
     toolCallId: "call-1",
     toolName: "str_replace_editor",
-    args: { command: "create", path: "/App.jsx" },
-    state: "call" as const,
+    input: { command: "create", path: "/App.jsx" },
+    state: "input-available" as string,
     ...overrides,
   };
 }
 
-test("shows spinner when state is call", () => {
+test("shows spinner when state is input-available", () => {
   render(
-    <ToolCallIndicator toolInvocation={makeInvocation({ state: "call" })} />
+    <ToolCallIndicator toolInvocation={makeInvocation({ state: "input-available" })} />
   );
   expect(screen.getByTestId("loader")).toBeDefined();
 });
 
-test("shows green dot when state is result with result", () => {
+test("shows green dot when state is output-available with output", () => {
   render(
     <ToolCallIndicator
-      toolInvocation={makeInvocation({ state: "result", result: "OK" })}
+      toolInvocation={makeInvocation({ state: "output-available", output: "OK" })}
     />
   );
   expect(screen.queryByTestId("loader")).toBeNull();
   expect(document.querySelector(".bg-emerald-500")).not.toBeNull();
 });
 
-test("shows spinner when state is result but result is falsy", () => {
+test("shows spinner when state is output-available but output is falsy", () => {
   render(
     <ToolCallIndicator
-      toolInvocation={makeInvocation({ state: "result", result: null })}
+      toolInvocation={makeInvocation({ state: "output-available", output: null })}
     />
   );
   expect(screen.getByTestId("loader")).toBeDefined();
@@ -109,7 +109,7 @@ test("renders friendly label for str_replace_editor create", () => {
   render(
     <ToolCallIndicator
       toolInvocation={makeInvocation({
-        args: { command: "create", path: "/Button.tsx" },
+        input: { command: "create", path: "/Button.tsx" },
       })}
     />
   );
@@ -121,7 +121,7 @@ test("renders friendly label for file_manager rename", () => {
     <ToolCallIndicator
       toolInvocation={makeInvocation({
         toolName: "file_manager",
-        args: { command: "rename", path: "/old.jsx", new_path: "/new.jsx" },
+        input: { command: "rename", path: "/old.jsx", new_path: "/new.jsx" },
       })}
     />
   );
@@ -131,7 +131,7 @@ test("renders friendly label for file_manager rename", () => {
 test("renders tool name as fallback for unknown tool", () => {
   render(
     <ToolCallIndicator
-      toolInvocation={makeInvocation({ toolName: "mystery_tool", args: {} })}
+      toolInvocation={makeInvocation({ toolName: "mystery_tool", input: {} })}
     />
   );
   expect(screen.getByText("mystery_tool")).toBeDefined();
