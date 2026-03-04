@@ -35,6 +35,20 @@ jobs:
           npm run setup
           npm run dev:daemon
 
+      - name: Wait for server
+        run: |
+          echo "Waiting for server at localhost:3000..."
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000 > /dev/null 2>&1; then
+              echo "Server is up after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Server did not start in 30s. Logs:"
+          cat logs.txt
+          exit 1
+
       - name: Run Claude Code
         id: claude
         uses: anthropics/claude-code-action@v1
